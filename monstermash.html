@@ -14,16 +14,53 @@ var monster = {
   currentFrame: 0,
   sourceX: 0,
   sourceY: 0,
+
+  //animation direction
   forward: true,
+
+  //state
+  HIDING: 0,
+  JUMPING: 1,
+  state: this.HIDING,
+
+  //store random time to wait
+  waitTime: undefined,
+
+  //method to find a random animation time
+  findWaitTime: function() {
+    this.waitTime = Math.ceil(Math.random() * 60);
+  },
+
   updateAnimation: function() {
+    if(this.waitTime > 0 || this.waitTime === undefined) {
+      this.state = this.HIDING;
+    } else {
+      this.state = this.JUMPING;
+    }
+
+    switch(this.state){
+      case this.HIDING:
+        this.currentFrame = 0;
+        this.waitTime--;
+        break;
+      case this.JUMPING:
+        //if last frame has been reached, set forward to false
+        if(this.currentFrame === this.numberOfFrames) {
+          this.forward = false;
+        }
+        //if the first frame has been reached, set forward to true
+        if(this.currentFrame === 0 && this.forward === false) {
+          //set forward to true, find a new waitTime
+          this.forward = true;
+          this.findWaitTime();
+          // set the state to HIDING and break the switch statement
+          this.state = this.HIDING;
+          break;
+        }
+    }
+
     this.sourceX = Math.floor(this.currentFrame % this.COLUMNS) * this.SIZE;
     this.sourceY = Math.floor(this.currentFrame / this.COLUMNS) * this.SIZE;
-    if (this.currentFrame === this.numberOfFrames) {
-      this.forward = false;
-    }
-    if (this.currentFrame === 0) {
-      this.forward = true;
-    }
     if (this.forward) {
       this.currentFrame++;
     } else {
