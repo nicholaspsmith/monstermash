@@ -14,23 +14,20 @@ var monster = {
   currentFrame: 0,
   sourceX: 0,
   sourceY: 0,
-  direction: 'up',
+  forward: true,
   updateAnimation: function() {
     this.sourceX = Math.floor(this.currentFrame % this.COLUMNS) * this.SIZE;
     this.sourceY = Math.floor(this.currentFrame / this.COLUMNS) * this.SIZE;
-    if (this.direction == 'up') {
-      if(this.currentFrame < this.numberOfFrames) {
-        this.currentFrame++;
-      } else {
-        this.direction = 'down';
-      }
+    if (this.currentFrame === this.numberOfFrames) {
+      this.forward = false;
     }
-    if (this.direction == 'down') {
-      if(this.currentFrame > 0) {
-        this.currentFrame--;
-      } else {
-        this.direction = 'up';
-      }
+    if (this.currentFrame === 0) {
+      this.forward = true;
+    }
+    if (this.forward) {
+      this.currentFrame++;
+    } else {
+      this.currentFrame--;
     }
   }
 };
