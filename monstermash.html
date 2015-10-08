@@ -38,7 +38,7 @@ var monster = {
       this.state = this.JUMPING;
     }
 
-    switch(this.state){
+    switch(this.state) {
       case this.HIDING:
         this.currentFrame = 0;
         this.waitTime--;
@@ -56,7 +56,7 @@ var monster = {
           // set the state to HIDING and break the switch statement
           this.state = this.HIDING;
           break;
-        }
+      }
     }
 
     this.sourceX = Math.floor(this.currentFrame % this.COLUMNS) * this.SIZE;
@@ -77,6 +77,7 @@ image.addEventListener('load',loadHandler,false);
 image.src = monster.IMAGE;
 
 function loadHandler() {
+  monster.findWaitTime();
   updateAnimation();
 }
 
