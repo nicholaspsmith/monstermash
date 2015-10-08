@@ -2,6 +2,11 @@
 <html>
 <head>
   <title>Animation Object</title>
+  <style>
+    canvas {
+      cursor: crosshair;
+    }
+  </style>
 </head>
 <canvas width="128" height="128"></canvas>
 
@@ -21,7 +26,12 @@ var monster = {
   //state
   HIDING: 0,
   JUMPING: 1,
+  HIT: 2,
   state: this.HIDING,
+
+  //properties to reset animation
+  timeToReset: 9,
+  resetCounter: 0,
 
   //store random time to wait
   waitTime: undefined,
@@ -32,10 +42,12 @@ var monster = {
   },
 
   updateAnimation: function() {
-    if(this.waitTime > 0 || this.waitTime === undefined) {
-      this.state = this.HIDING;
-    } else {
-      this.state = this.JUMPING;
+    if (this.state !== this.HIT) {
+      if(this.waitTime > 0 || this.waitTime === undefined) {
+        this.state = this.HIDING;
+      } else {
+        this.state = this.JUMPING;
+      }
     }
 
     switch(this.state) {
@@ -55,8 +67,24 @@ var monster = {
           this.findWaitTime();
           // set the state to HIDING and break the switch statement
           this.state = this.HIDING;
-          break;
-      }
+        }
+        break;
+      case this.HIT:
+        //set the current frame to the last one on the tilesheet
+        this.currentFrame = 6;
+
+        //update reset counter by 1
+        this.resetCounter++;
+
+        //reset the animation if the restCounter equals the timeToReset
+        if(this.resetCounter === this.timeToReset) {
+          this.state = this.HIDING;
+          this.forward = true;
+          this.currentFrame = 0;
+          this.resetCounter = 0;
+          this.findWaitTime();
+        }
+        break;
     }
 
     this.sourceX = Math.floor(this.currentFrame % this.COLUMNS) * this.SIZE;
@@ -71,6 +99,7 @@ var monster = {
 
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
+canvas.addEventListener('mousedown', mousedownHandler, false);
 
 var image = new Image();
 image.addEventListener('load',loadHandler,false);
@@ -82,7 +111,7 @@ function loadHandler() {
 }
 
 function updateAnimation() {
-  setTimeout(updateAnimation, 100);
+  setTimeout(updateAnimation, 120);
   monster.updateAnimation();
   render();
 }
@@ -94,6 +123,12 @@ function render() {
     monster.sourceX, monster.sourceY, monster.SIZE, monster.SIZE,
     0, 0, monster.SIZE, monster.SIZE
   );
+}
+
+function mousedownHandler() {
+  if (monster.state === monster.JUMPING){
+    monster.state = monster.HIT;
+  }
 }
 
 </script>
