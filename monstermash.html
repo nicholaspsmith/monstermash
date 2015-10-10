@@ -17,9 +17,11 @@
     }
     </style>
   </head>
+  <div id="output"></div>
   <div id="stage"></div>
 
   <script>
+  var monstersHit = 0;
   var monster = {
     IMAGE: 'monsterTileSheet.png',
     SIZE: 128,
@@ -107,6 +109,7 @@
   };
 
   var stage = document.getElementById('stage');
+  var output = document.querySelector('#output');
 
   // The number of rows and columns and the size of each cell
   var ROWS = 3;
@@ -149,13 +152,20 @@
 
   function loadHandler() {
     buildMap();
+    gameTimer.time = 30;
+    gameTimer.start();
     updateAnimation();
   }
 
   function updateAnimation() {
-    setTimeout(updateAnimation, 120);
+    if (gameTimer.time > 0) {
+      setTimeout(updateAnimation, 120);
+    }
     for(var i = 0; i < monsterObjects.length;i++) {
       monsterObjects[i].updateAnimation();
+    }
+    if(gameTimer.time === 0) {
+      endGame();
     }
     render();
   }
@@ -167,6 +177,8 @@
       drawingSurface.clearRect(0,0,SIZE,SIZE);
 
       drawingSurface.drawImage(image,monster.sourceX,monster.sourceY,SIZE,SIZE,0,0,SIZE,SIZE);
+
+      output.innerHTML = 'Monsters smashed: ' +monstersHit + ', Time Left: ' + gameTimer.time;
     }
   }
 
@@ -177,8 +189,36 @@
         var monster = monsterObjects[i];
         if (monster.state === monster.JUMPING) {
           monster.state = monster.HIT;
+          monstersHit++;
         }
       }
+    }
+  }
+
+  var gameTimer = {
+    time: 0,
+    interval: undefined,
+    start: function() {
+      var self = this;
+      this.interval = setInterval(function(){self.tick();},1000);
+    },
+    tick: function() {
+      this.time--;
+    },
+    stop: function() {
+      clearInterval(this.interval);
+    },
+    reset: function() {
+      this.time = 0;
+    }
+  }
+
+  function endGame() {
+    gameTimer.stop();
+
+    for(var i = 0;i< monsterCanvases.length;i++) {
+      var canvas = monsterCanvases[i];
+      canvas.removeEventListener('mousedown',mousedownHandler,false);
     }
   }
 
