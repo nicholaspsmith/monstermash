@@ -171,8 +171,14 @@
   }
 
   function mousedownHandler() {
-    if (monster.state === monster.JUMPING){
-      monster.state = monster.HIT;
+    var theCanvasThatWasClicked = event.target;
+    for(var i =0; i < monsterCanvases.length;i++) {
+      if (monsterCanvases[i] === theCanvasThatWasClicked) {
+        var monster = monsterObjects[i];
+        if (monster.state === monster.JUMPING) {
+          monster.state = monster.HIT;
+        }
+      }
     }
   }
 
